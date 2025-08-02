@@ -116,3 +116,14 @@ async def test_battery(
     assert hass.states.get("sensor.telecommande_niveau_de_batterie").state == "25"
     assert hass.states.get("sensor.ouverture_porte_niveau_de_batterie").state == "50"
     assert hass.states.get("sensor.detecteur_niveau_de_batterie").state == "75"
+
+
+async def test_no_ftth_media(hass: HomeAssistant, router: Mock) -> None:
+    """Test no ftth info when connection media is not ftth."""
+    data_connection_get_status = deepcopy(DATA_CONNECTION_GET_STATUS)
+    data_connection_get_status["media"] = "dsl"
+    router().connection.get_status.return_value = data_connection_get_status
+
+    entry = await setup_platform(hass, SENSOR_DOMAIN)
+
+    assert entry.runtime_data.ftth_info == {}
