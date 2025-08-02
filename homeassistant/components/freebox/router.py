@@ -202,8 +202,12 @@ class FreeboxRouter:
             except HttpRequestError:
                 self.ftth_info = {}
             else:
-                self.sensors_connection["sfp_pwr_rx"] = self.ftth_info["sfp_pwr_rx"]
-                self.sensors_connection["sfp_pwr_tx"] = self.ftth_info["sfp_pwr_tx"]
+                self.sensors_connection["sfp_pwr_rx"] = (
+                    self.ftth_info["sfp_pwr_rx"] / 100
+                )
+                self.sensors_connection["sfp_pwr_tx"] = (
+                    self.ftth_info["sfp_pwr_tx"] / 100
+                )
 
         self._attrs = {
             "IPv4": connection_datas.get("ipv4"),

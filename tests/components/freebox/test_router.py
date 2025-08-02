@@ -94,11 +94,11 @@ async def test_update_sensors_ftth_success(hass: HomeAssistant, router: Mock) ->
     assert freebox.ftth_info == DATA_CONNECTION_GET_FTTH
     assert (
         freebox.sensors_connection["sfp_pwr_rx"]
-        == DATA_CONNECTION_GET_FTTH["sfp_pwr_rx"]
+        == DATA_CONNECTION_GET_FTTH["sfp_pwr_rx"] / 100
     )
     assert (
         freebox.sensors_connection["sfp_pwr_tx"]
-        == DATA_CONNECTION_GET_FTTH["sfp_pwr_tx"]
+        == DATA_CONNECTION_GET_FTTH["sfp_pwr_tx"] / 100
     )
 
 
