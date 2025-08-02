@@ -1,7 +1,7 @@
 """Tests for the Freebox sensors."""
 
 from copy import deepcopy
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 from freezegun.api import FrozenDateTimeFactory
 
@@ -127,3 +127,19 @@ async def test_no_ftth_media(hass: HomeAssistant, router: Mock) -> None:
     entry = await setup_platform(hass, SENSOR_DOMAIN)
 
     assert entry.runtime_data.ftth_info == {}
+
+
+async def test_ftth_no_power_values(hass: HomeAssistant, router: Mock) -> None:
+    """Test FTTH info without power values doesn't create sensors."""
+    router().connection.get_ftth = AsyncMock(
+        return_value={"sfp_model": "ABC", "sfp_vendor": "Vendor"}
+    )
+
+    entry = await setup_platform(hass, SENSOR_DOMAIN)
+
+    assert hass.states.get("sensor.freebox_sfp_rx") is None
+    assert hass.states.get("sensor.freebox_sfp_tx") is None
+    assert entry.runtime_data.ftth_info == {
+        "sfp_model": "ABC",
+        "sfp_vendor": "Vendor",
+    }
