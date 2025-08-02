@@ -34,6 +34,9 @@ DATA_LAN_GET_HOSTS_LIST_MODE_BRIDGE = load_json_object_fixture(
     "freebox/lan_get_hosts_list_bridge.json"
 )
 
+# FTTH
+DATA_CONNECTION_GET_FTTH = load_json_object_fixture("freebox/connection_get_ftth.json")
+
 # Home
 # ALL
 DATA_HOME_GET_NODES = load_json_array_fixture("freebox/home_get_nodes.json")
