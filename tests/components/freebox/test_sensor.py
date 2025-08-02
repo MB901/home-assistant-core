@@ -1,7 +1,7 @@
 """Tests for the Freebox sensors."""
 
 from copy import deepcopy
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 from freezegun.api import FrozenDateTimeFactory
 
@@ -116,3 +116,19 @@ async def test_battery(
     assert hass.states.get("sensor.telecommande_niveau_de_batterie").state == "25"
     assert hass.states.get("sensor.ouverture_porte_niveau_de_batterie").state == "50"
     assert hass.states.get("sensor.detecteur_niveau_de_batterie").state == "75"
+
+
+async def test_ftth_no_power_values(hass: HomeAssistant, router: Mock) -> None:
+    """Test FTTH info without power values doesn't create sensors."""
+    router().connection.get_ftth = AsyncMock(
+        return_value={"sfp_model": "ABC", "sfp_vendor": "Vendor"}
+    )
+
+    entry = await setup_platform(hass, SENSOR_DOMAIN)
+
+    assert hass.states.get("sensor.freebox_sfp_rx") is None
+    assert hass.states.get("sensor.freebox_sfp_tx") is None
+    assert entry.runtime_data.ftth_info == {
+        "sfp_model": "ABC",
+        "sfp_vendor": "Vendor",
+    }
