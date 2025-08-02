@@ -126,6 +126,7 @@ class FreeboxRouter:
         self.raids: dict[int, dict[str, Any]] = {}
         self.sensors_temperature: dict[str, int] = {}
         self.sensors_connection: dict[str, float] = {}
+        self.ftth_info: dict[str, Any] = {}
         self.call_list: list[dict[str, Any]] = []
         self.home_granted = True
         self.home_devices: dict[str, Any] = {}
@@ -177,6 +178,11 @@ class FreeboxRouter:
     async def update_sensors(self) -> None:
         """Update Freebox sensors."""
 
+        # Reset FTTH information
+        self.ftth_info = {}
+        self.sensors_connection.pop("sfp_pwr_rx", None)
+        self.sensors_connection.pop("sfp_pwr_tx", None)
+
         # System sensors
         syst_datas: dict[str, Any] = await self._api.system.get_config()
 
@@ -189,6 +195,15 @@ class FreeboxRouter:
         connection_datas: dict[str, Any] = await self._api.connection.get_status()
         for sensor_key in CONNECTION_SENSORS_KEYS:
             self.sensors_connection[sensor_key] = connection_datas[sensor_key]
+
+        if connection_datas["media"] == "ftth":
+            try:
+                self.ftth_info = await self._api.connection.get_ftth()
+            except HttpRequestError:
+                self.ftth_info = {}
+            else:
+                self.sensors_connection["sfp_pwr_rx"] = self.ftth_info["sfp_pwr_rx"]
+                self.sensors_connection["sfp_pwr_tx"] = self.ftth_info["sfp_pwr_tx"]
 
         self._attrs = {
             "IPv4": connection_datas.get("ipv4"),
